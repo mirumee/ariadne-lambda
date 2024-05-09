@@ -1,0 +1,61 @@
+# Distribution / packaging
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Serverless directories
+.serverless
+
+.ruff_cache/
+node_modules/
+__pycache__
+
+.DS_Store
+.env
+.pytest_cache
+.python-version
+
+package
+*.zip
+
+# Ignore the .terraform directory
+.terraform/
+
+# Ignore Terraform lock files
+.terraform.lock.hcl
+
+# Ignore all .tfstate files
+*.tfstate
+*.tfstate.*
+
+# Ignore crash log files
+crash.log
+
+# Ignore any .tfvars files that may contain sensitive data
+*.tfvars
+
+# Ignore override files as they are usually used to override resources locally
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Ignore CLI configuration files
+.terraformrc
+terraform.rc
+
+# pytest-cov
+.coverage

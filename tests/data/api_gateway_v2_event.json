@@ -1,0 +1,28 @@
+{
+    "version": "2.0",
+    "rawPath": "/my-resource",
+    "body": "",
+    "isBase64Encoded": false,
+    "headers": {
+      "host": "api.example.com",
+      "user-agent": "Mozilla/5.0",
+      "accept": "application/json"
+    },
+    "queryStringParameters": {
+      "param1": "value1",
+      "param2": "value2"
+    },
+    "requestContext": {
+      "http": {
+        "method": "GET",
+        "path": "/my-resource",
+        "protocol": "HTTP/1.1",
+        "sourceIp": "127.0.0.1"
+      },
+      "routeKey": "GET /my-resource",
+      "accountId": "account-id",
+      "stage": "prod"
+    },
+    "routeKey": "GET /my-resource",
+    "rawQueryString": "param1=value1&param2=value2"
+  }

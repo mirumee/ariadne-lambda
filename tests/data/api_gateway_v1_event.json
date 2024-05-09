@@ -1,0 +1,42 @@
+{
+
+    "path": "/my-resource",
+    "resource": "/my-resource",
+    "httpMethod": "GET",
+    
+    "body": null,
+    "isBase64Encoded": false,
+  
+    "headers": {
+      "Host": "api.example.com",
+      "User-Agent": "Mozilla/5.0",
+      "Accept": "application/json"
+    },
+  
+    "queryStringParameters": {
+      "param1": "value1",
+      "param2": "value2"
+    },
+    
+    "requestContext": {
+      "resourceId": "resource-id",
+      "apiId": "api-id",
+      "resourcePath": "/my-resource",
+      "httpMethod": "GET",
+      "requestId": "request-id",
+      "accountId": "account-id",
+      "identity": {
+        "apiKey": null,
+        "userAgent": "Mozilla/5.0",
+        "user": null,
+        "cognitoAuthenticationType": null,
+        "cognitoAuthenticationProvider": null,
+        "sourceIp": "127.0.0.1",
+        "accountId": null
+      },
+      "stage": "prod"
+    },
+    
+    "pathParameters": null,
+    "stageVariables": null
+  }
