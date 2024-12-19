@@ -26,8 +26,13 @@ def test_api_v2_event(api_gateway_v2_event_payload):
 
 def test_api_v2_event_lambda_url(api_gateway_v2_lambda_url_event_payload):
     request = Request.create_from_event(api_gateway_v2_lambda_url_event_payload)
-    assert request.method == api_gateway_v2_lambda_url_event_payload["requestContext"]["http"]["method"]
-    assert request.path == api_gateway_v2_lambda_url_event_payload["requestContext"]["http"]["path"]
+    assert (
+        request.method
+        == api_gateway_v2_lambda_url_event_payload["requestContext"]["http"]["method"]
+    )
+    assert (
+        request.path == api_gateway_v2_lambda_url_event_payload["requestContext"]["http"]["path"]
+    )
     assert request.body == ""
     assert request.is_base64_encoded is False
     assert request.headers == api_gateway_v2_lambda_url_event_payload["headers"]
