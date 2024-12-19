@@ -23,5 +23,10 @@ def api_gateway_v2_event_payload():
 
 
 @pytest.fixture
+def api_gateway_v2_lambda_url_event_payload():
+    return load_data_file("api_gateway_v2_lambda_url_event.json")
+
+
+@pytest.fixture
 def lambda_context():
     return MagicMock()
