@@ -24,6 +24,21 @@ def test_api_v2_event(api_gateway_v2_event_payload):
     assert request.params == api_gateway_v2_event_payload["queryStringParameters"]
 
 
+def test_api_v2_event_lambda_url(api_gateway_v2_lambda_url_event_payload):
+    request = Request.create_from_event(api_gateway_v2_lambda_url_event_payload)
+    assert (
+        request.method
+        == api_gateway_v2_lambda_url_event_payload["requestContext"]["http"]["method"]
+    )
+    assert (
+        request.path == api_gateway_v2_lambda_url_event_payload["requestContext"]["http"]["path"]
+    )
+    assert request.body == ""
+    assert request.is_base64_encoded is False
+    assert request.headers == api_gateway_v2_lambda_url_event_payload["headers"]
+    assert request.params == {}
+
+
 def test_response_initialization():
     # When
     response = Response(status_code=200, body="OK", headers={"Content-Type": "application/json"})
