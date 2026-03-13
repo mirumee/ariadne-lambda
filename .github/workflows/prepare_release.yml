@@ -1,0 +1,64 @@
+name: Prepare release
+
+on:
+  push:
+    tags:
+      - "*"
+  workflow_call:
+  workflow_dispatch:
+
+env:
+  PYTHONUNBUFFERED: "1"
+  FORCE_COLOR: "1"
+
+jobs:
+  build:
+    uses: ./.github/workflows/build.yml
+    permissions:
+      contents: read
+      id-token: write
+
+  create-release:
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate release notes
+        id: release-notes
+        uses: orhun/git-cliff-action@v4
+        with:
+          config: cliff.toml
+          args: --latest --strip all
+        env:
+          OUTPUT: RELEASE_NOTES.md
+          GITHUB_REPO: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download distribution artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+
+      - name: Create draft release
+        id: create-draft-release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ./dist/*
+          draft: true
+          body_path: RELEASE_NOTES.md
+
+      - name: Summary
+        run: |
+          echo "# Release summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "Url: ${{ steps.create-draft-release.outputs.url }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "You can now publish the release on GitHub" >> "$GITHUB_STEP_SUMMARY"
