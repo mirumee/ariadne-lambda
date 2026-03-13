@@ -29,7 +29,7 @@ class Request(BaseModel):
             "body": "",
             "is_base64_encoded": event["isBase64Encoded"],
             "headers": lowered_key_headers,
-            "params": event["queryStringParameters"],
+            "params": event.get("queryStringParameters", {}),
         }
 
         if http_context := event["requestContext"].get("http"):
@@ -43,11 +43,8 @@ class Request(BaseModel):
             request_data["path"] = event["path"]
             request_data["method"] = event["httpMethod"].upper()
 
-        if body := event["body"]:
+        if body := event.get("body"):
             request_data["body"] = body
-
-        if not request_data["params"]:
-            request_data["params"] = {}
 
         return cls(**request_data)
 

@@ -1,0 +1,24 @@
+{
+  "version": "2.0",
+  "routeKey": "GET /my-resource",
+  "rawPath": "/",
+  "rawQueryString": "",
+  "headers": {
+    "host": "api.example.com",
+    "user-agent": "Mozilla/5.0",
+    "accept": "application/json"
+  },
+  "requestContext": {
+    "accountId": "anonymous",
+    "http": {
+      "method": "GET",
+      "path": "/my-resource",
+      "protocol": "HTTP/1.1",
+      "sourceIp": "109.243.69.50"
+    },
+    "requestId": "08752adc-1bb9-4598-b314-0d147401a1eb",
+    "routeKey": "GET /my-resource",
+    "stage": "prod"
+  },
+  "isBase64Encoded": false
+}
