@@ -8,7 +8,7 @@ from aws_lambda_powertools.utilities.typing import LambdaContext
 
 class GraphQLLambdaHandler(GraphQLHandler):
     @abstractmethod
-    async def handle(self, event: dict, context: LambdaContext):
+    async def handle(self, event: dict, context: LambdaContext):  # ty: ignore[invalid-method-override]
         """An entrypoint for the AWS Lambda connection handler.
 
         This method is called by Ariadne AWS Lambda GraphQL application. Subclasses

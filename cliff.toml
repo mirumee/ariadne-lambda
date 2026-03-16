@@ -1,0 +1,77 @@
+# GitHub integration is activated in CI via GITHUB_REPO env var.
+
+[changelog]
+header = """# CHANGELOG
+
+All notable unreleased changes to this project will be documented in this file.
+
+For released versions, see the [Releases](https://github.com/mirumee/ariadne-lambda/releases) page.
+
+"""
+body = """
+{% if version -%}
+## {{ version }} ({{ timestamp | date(format="%Y-%m-%d") }})
+{% else -%}
+## Unreleased
+{% endif -%}
+{% set breaking_commits = commits | filter(attribute="breaking", value=true) -%}
+{% if breaking_commits %}
+### ⚠️ Breaking Changes
+{% for commit in breaking_commits -%}
+- **{{ commit.message | upper_first | trim }}**{% if commit.body %}
+
+ {{ commit.body | trim | indent(prefix=" ") }}
+{% endif %}
+{% endfor %}
+{%- endif %}
+{%- for group, commits in commits | group_by(attribute="group") -%}
+{%- set non_breaking = commits | filter(attribute="breaking", value=false) -%}
+{%- if non_breaking and group != "_misc" %}
+### {{ group }}
+{% for commit in non_breaking -%}
+- {{ commit.message | upper_first | trim }}{% if commit.remote.username %} (by @{{ commit.remote.username }}{% if commit.remote.pr_number %} in [#{{ commit.remote.pr_number }}](https://github.com/mirumee/ariadne-lambda/pull/{{ commit.remote.pr_number }}){% endif %}){% endif %}
+{% endfor %}
+{%- endif -%}
+{% endfor %}
+{% if version %}
+## What's Changed
+{% for commit in commits -%}
+* {{ commit.message | upper_first | trim }}{% if commit.remote.username %} by @{{ commit.remote.username }}{% endif %}{% if commit.remote.pr_number %} in [#{{ commit.remote.pr_number }}](https://github.com/mirumee/ariadne-lambda/pull/{{ commit.remote.pr_number }}){% endif %}
+{% endfor %}
+{%- if github.contributors is defined -%}
+{%- set new_contributors = github.contributors | filter(attribute="is_first_time", value=true) -%}
+{%- if new_contributors | length != 0 %}
+### New Contributors
+{% for contributor in new_contributors -%}
+* @{{ contributor.username }} made their first contribution{% if contributor.pr_number %} in [#{{ contributor.pr_number }}](https://github.com/mirumee/ariadne-lambda/pull/{{ contributor.pr_number }}){% endif %}
+{% endfor %}
+{%- endif -%}
+{%- endif %}
+**Full Changelog**: https://github.com/mirumee/ariadne-lambda/compare/{{ previous.version }}...{{ version }}
+{% endif -%}
+"""
+trim = true
+footer = ""
+
+[git]
+conventional_commits = true
+filter_unconventional = true
+split_commits = false
+protect_breaking_commits = false
+filter_commits = false
+sort_commits = "oldest"
+tag_pattern = "^[0-9]+\\.[0-9]+(\\.[0-9]+)?$"
+skip_tags = "\\.(rc|dev)[0-9]*$"
+ignore_tags = "\\.(b|beta|alpha)[0-9]*$"
+
+commit_parsers = [
+  { message = "^feat", group = "✨ New Features" },
+  { message = "^fix", group = "🐛 Bug Fixes" },
+  { message = "^perf", group = "⚡ Performance" },
+  { message = "^refactor", group = "♻️ Refactoring" },
+  { message = "^docs?", group = "📚 Documentation" },
+  { message = "^build", group = "🛠️ Build System" },
+  { message = "^ci", group = "👷 CI/CD" },
+  { message = "^test", group = "🧪 Testing" },
+  { message = ".*", group = "_misc" },
+]

@@ -20,7 +20,9 @@ def handler():
 @pytest.mark.asyncio
 async def test_handle(handler, api_gateway_v1_event_payload, lambda_context):
     # Given
-    mocked_handler_request = AsyncMock(return_value=Response(body="response", status_code=200))
+    mocked_handler_request = AsyncMock(
+        return_value=Response(body="response", status_code=200)
+    )
     handler.handle_request = mocked_handler_request
 
     # When
@@ -37,7 +39,9 @@ async def test_handle_request_post_graphql(handler, api_gateway_v1_event_payload
     # Given
     request = Request.create_from_event(api_gateway_v1_event_payload)
     request.method = "POST"
-    mocked_graphql_http_server = AsyncMock(return_value=Response(body="response", status_code=200))
+    mocked_graphql_http_server = AsyncMock(
+        return_value=Response(body="response", status_code=200)
+    )
     handler.graphql_http_server = mocked_graphql_http_server
 
     # When
@@ -46,7 +50,7 @@ async def test_handle_request_post_graphql(handler, api_gateway_v1_event_payload
     # Then
     mocked_graphql_http_server.assert_called_once()
     assert response.status_code == 200
-    assert "response" == response.body
+    assert response.body == "response"
 
 
 @pytest.mark.asyncio
@@ -54,7 +58,9 @@ async def test_handle_request_get_explorer(handler, api_gateway_v1_event_payload
     # Given
     handler.introspection = True
     handler.explorer = True
-    mocked_render_explorer = AsyncMock(return_value=Response(body="response", status_code=200))
+    mocked_render_explorer = AsyncMock(
+        return_value=Response(body="response", status_code=200)
+    )
     handler.render_explorer = mocked_render_explorer
     request = Request.create_from_event(api_gateway_v1_event_payload)
 
@@ -64,7 +70,7 @@ async def test_handle_request_get_explorer(handler, api_gateway_v1_event_payload
     # Then
     mocked_render_explorer.assert_called_once()
     assert response.status_code == 200
-    assert "response" == response.body
+    assert response.body == "response"
 
 
 @pytest.mark.asyncio
@@ -87,10 +93,14 @@ async def test_handle_request_method_not_allowed(handler, api_gateway_v1_event_p
 
 
 @pytest.mark.asyncio
-async def test_handle_request_get_graphql_http_server(handler, api_gateway_v1_event_payload):
+async def test_handle_request_get_graphql_http_server(
+    handler, api_gateway_v1_event_payload
+):
     # Given
     handler.execute_get_queries = True
-    mocked_graphql_http_server = AsyncMock(return_value=Response(body="response", status_code=200))
+    mocked_graphql_http_server = AsyncMock(
+        return_value=Response(body="response", status_code=200)
+    )
     handler.graphql_http_server = mocked_graphql_http_server
     request = Request.create_from_event(api_gateway_v1_event_payload)
     request.params = {"query": "hello"}
@@ -101,7 +111,7 @@ async def test_handle_request_get_graphql_http_server(handler, api_gateway_v1_ev
     # Then
     mocked_graphql_http_server.assert_called_once()
     assert response.status_code == 200
-    assert "response" == response.body
+    assert response.body == "response"
 
 
 @pytest.mark.asyncio

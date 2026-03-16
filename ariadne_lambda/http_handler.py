@@ -1,6 +1,7 @@
 import json
+from collections.abc import Awaitable, Callable
 from inspect import isawaitable
-from typing import Any
+from typing import Any, cast
 
 from ariadne.constants import (
     DATA_TYPE_JSON,
@@ -27,7 +28,8 @@ class GraphQLAWSAPIHTTPGatewayHandler(GraphQLLambdaHandler):
     """Handler for AWS Lambda functions triggered by HTTP requests via API Gateway.
 
     Designed to process both Query and Mutation operations in a GraphQL schema.
-    Ideal for serverless architectures, providing a bridge between AWS Lambda and GraphQL.
+    Ideal for serverless architectures, providing a bridge between
+    AWS Lambda and GraphQL.
     """
 
     def __init__(
@@ -52,12 +54,16 @@ class GraphQLAWSAPIHTTPGatewayHandler(GraphQLLambdaHandler):
         return (await self.handle_request(request)).render()
 
     async def handle_request(self, request: Request) -> Response:
-        """Determines the request type (GET or POST) and routes to the corresponding GraphQL
-        processor.
+        """Determines the request type (GET or POST) and routes to
+        the corresponding GraphQL processor.
         Supports executing queries directly from GET requests, or handling
         introspection and GraphQL explorers."""
         if request.method == "GET":
-            if self.execute_get_queries and request.params and request.params.get("query"):
+            if (
+                self.execute_get_queries
+                and request.params
+                and request.params.get("query")
+            ):
                 return await self.graphql_http_server(request)
             if self.introspection and self.explorer:
                 # only render explorer when introspection is enabled
@@ -80,9 +86,10 @@ class GraphQLAWSAPIHTTPGatewayHandler(GraphQLLambdaHandler):
         or `None`. If explorer returns `None`, `405` method not allowed response
         is returned instead.
         """
-        explorer_html = explorer.html(request)
-        if isawaitable(explorer_html):
-            explorer_html = await explorer_html
+        explorer_html_result = explorer.html(request)
+        if isawaitable(explorer_html_result):
+            explorer_html_result = await explorer_html_result
+        explorer_html = cast(str | None, explorer_html_result)
         if explorer_html:
             return Response(body=explorer_html, headers={"Content-Type": "text/html"})
 
@@ -91,7 +98,8 @@ class GraphQLAWSAPIHTTPGatewayHandler(GraphQLLambdaHandler):
     async def graphql_http_server(self, request: Request) -> Response:
         """Executes GraphQL queries or mutations based on the POST request's body.
 
-        Parses the request, executes the GraphQL query, and formats the response as JSON.
+        Parses the request, executes the GraphQL query,
+        and formats the response as JSON.
         """
         try:
             data = await self.extract_data_from_request(request)
@@ -114,10 +122,12 @@ class GraphQLAWSAPIHTTPGatewayHandler(GraphQLLambdaHandler):
         AWS Lambda's HTTP response format.
 
         Args:
-            request: A `Request` object containing the parsed HTTP request from API Gateway.
+            request: A `Request` object containing the parsed HTTP request
+                from API Gateway.
 
         Returns:
-            A `Response` object containing the JSON-formatted result of the GraphQL operation.
+            A `Response` object containing the JSON-formatted result
+                of the GraphQL operation.
         """
         content_type = request.headers.get("content-type", "")
         content_type = content_type.split(";")[0]
@@ -145,7 +155,8 @@ class GraphQLAWSAPIHTTPGatewayHandler(GraphQLLambdaHandler):
         Parses the JSON body of an HTTP request to extract the GraphQL query data.
 
         Args:
-            request: A `Request` object containing the parsed HTTP request from API Gateway.
+            request: A `Request` object containing the parsed HTTP request
+                from API Gateway.
 
         Returns:
             A dictionary containing the extracted GraphQL query data.
@@ -159,14 +170,18 @@ class GraphQLAWSAPIHTTPGatewayHandler(GraphQLLambdaHandler):
             raise HttpBadRequestError("Request body is not a valid JSON") from ex
 
     async def extract_data_from_multipart_request(self, request: Request):
-        raise NotImplementedError("Multipart requests are not yet supported in AWS Lambda")
+        raise NotImplementedError(
+            "Multipart requests are not yet supported in AWS Lambda"
+        )
 
     def extract_data_from_get_request(self, request: Request) -> dict:
         """
-        Extracts the GraphQL query data from the query string parameters of a GET request.
+        Extracts the GraphQL query data from
+        the query string parameters of a GET request.
 
         Args:
-            request: A `Request` object containing the parsed HTTP request from API Gateway.
+            request: A `Request` object containing the parsed HTTP request
+                from API Gateway.
 
         Returns:
             A dictionary containing the GraphQL query, operation name, and variables.
@@ -186,7 +201,9 @@ class GraphQLAWSAPIHTTPGatewayHandler(GraphQLLambdaHandler):
             try:
                 clean_variables = json.loads(variables)
             except (TypeError, ValueError) as ex:
-                raise HttpBadRequestError("Variables query arg is not a valid JSON") from ex
+                raise HttpBadRequestError(
+                    "Variables query arg is not a valid JSON"
+                ) from ex
 
         return {
             "query": query,
@@ -263,12 +280,20 @@ class GraphQLAWSAPIHTTPGatewayHandler(GraphQLLambdaHandler):
         Returns:
             A list of extensions to be used during the execution of the GraphQL query.
         """
-        if callable(self.extensions):
-            extensions = self.extensions(request, context)
-            if isawaitable(extensions):
-                extensions = await extensions  # type: ignore
+        extensions = self.extensions
+        if not callable(extensions):
             return extensions
-        return self.extensions
+
+        extensions_factory = cast(
+            Callable[
+                [Any, ContextValue | None], ExtensionList | Awaitable[ExtensionList]
+            ],
+            extensions,
+        )
+        resolved_extensions = extensions_factory(request, context)
+        if isawaitable(resolved_extensions):
+            resolved_extensions = await resolved_extensions
+        return cast(ExtensionList, resolved_extensions)
 
     async def create_json_response(
         self,
@@ -277,7 +302,8 @@ class GraphQLAWSAPIHTTPGatewayHandler(GraphQLLambdaHandler):
         success: bool,
     ) -> Response:
         """
-        Formats the GraphQL execution result into a JSON response suitable for AWS Lambda.
+        Formats the GraphQL execution result into a JSON response
+        suitable for AWS Lambda.
 
         Args:
             request: The original request object.
