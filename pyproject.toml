@@ -25,13 +25,14 @@ classifiers = [
   "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
-  "ariadne>=0.23.0,<0.30.0",
+  "ariadne>=1.0.1,<2.0.0",
   "aws-lambda-powertools>=3.0.0,<4.0.0",
   "pydantic>=2.4.0,<3.0.0",
 ]
 
 [project.optional-dependencies]
-dev = ["ipdb"]
+# `pip` is required in `.venv` when using Hatch with `path = ".venv"` (Hatch syncs via pip).
+dev = ["ipdb", "pip>=24.0"]
 test = [
   "pytest>=9.0.0,<10.0.0",
   "pytest-asyncio>=1.0.0,<2.0.0",

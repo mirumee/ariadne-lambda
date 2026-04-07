@@ -2,11 +2,11 @@ from abc import abstractmethod
 from inspect import isawaitable
 from typing import Any
 
-from ariadne.asgi.handlers.base import GraphQLHandler
+from ariadne.asgi.handlers.base import GraphQLHandlerBase
 from aws_lambda_powertools.utilities.typing import LambdaContext
 
 
-class GraphQLLambdaHandler(GraphQLHandler):
+class GraphQLLambdaHandler(GraphQLHandlerBase):
     @abstractmethod
     async def handle(self, event: dict, context: LambdaContext):  # ty: ignore[invalid-method-override]
         """An entrypoint for the AWS Lambda connection handler.
@@ -28,13 +28,12 @@ class GraphQLLambdaHandler(GraphQLHandler):
     async def get_context_for_request(
         self,
         request: Any,
-        data: dict,
+        data: Any,
     ) -> Any:
         """Return the context value for the request.
 
-        This method is called by the handler to get the context value for the
-        request. Subclasses can override it to provide custom context value
-        based on the request.
+        Matches `GraphQLHandlerBase.get_context_for_request`: callable
+        `context_value` must accept `(request, data)` (sync or async).
 
         # Required arguments
 
@@ -43,10 +42,7 @@ class GraphQLLambdaHandler(GraphQLHandler):
         `data`: GraphQL data from connection.
         """
         if callable(self.context_value):
-            try:
-                context = self.context_value(request, data)  # type: ignore
-            except TypeError:  # TODO: remove in 0.20
-                context = self.context_value(request)  # type: ignore
+            context = self.context_value(request, data)
 
             if isawaitable(context):
                 context = await context
