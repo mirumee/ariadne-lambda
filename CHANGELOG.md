@@ -22,14 +22,17 @@ For released versions, see the [Releases](https://github.com/mirumee/ariadne-lam
 
 ### CI/CD
 
-- Run tests on **Python 3.10–3.14** in a matrix; refresh GitHub Actions (`actions/setup-python`, reusable **test** / **build** / **prepare_release** / **publish** workflows).
+- Run tests on **Python 3.10–3.14** in a matrix; use **uv** (`astral-sh/setup-uv`) for dependency sync and running checks.
+- Refresh GitHub Actions (`actions/setup-python`, reusable **test** / **build** / **prepare_release** / **publish** workflows).
 - Replace older standalone workflows (`run_tests`, `code_quality`, `deploy`) with the modernized pipeline.
 
 ### Build System
 
-- **Hatch** packaging, expanded `pyproject.toml` metadata, optional extras for dev/test/types, and **git-cliff** (`cliff.toml`) for release notes.
+- **Hatchling** remains the build backend; **uv** replaces the Hatch CLI for environments, tests, lint, and builds (`uv sync`, `uv run`, `uv build`).
+- Expanded `pyproject.toml` metadata, optional extras for dev/test/types (including **ruff** and **git-cliff** in `dev`), and **git-cliff** (`cliff.toml`) for release notes.
+- Add a **justfile** with common `uv run` targets (`lint`, `test`, `check`, changelog helpers).
 - Disable coverage **`fail_under`** until the test suite is expanded (previously targeted 90%).
-- Add **`pip`** to the `dev` optional extra so Hatch can install into a uv-managed `.venv` when `[tool.hatch.envs.default] path = ".venv"` is set (Hatch syncs via pip).
+- Add **`pip`** to the `dev` optional extra for edge cases where `pip` is invoked alongside uv.
 - Add **`uv.lock`** for reproducible local and CI installs.
 
 ### Documentation
