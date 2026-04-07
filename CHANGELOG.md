@@ -7,6 +7,6 @@ For released versions, see the [Releases](https://github.com/mirumee/ariadne-lam
 ## Unreleased
 
 ### 🛠️ Build System
-- Modernize packaging metadata and CI/release workflows
+- Modernize packaging metadata and CI/release workflows (by @DamianCzajkowski)
 
 
