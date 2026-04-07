@@ -31,12 +31,16 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# `pip` is required in `.venv` when using Hatch with `path = ".venv"` (Hatch syncs via pip).
-dev = ["ipdb", "pip>=24.0"]
+dev = [
+  "git-cliff>=2.0.0,<3.0.0",
+  "ipdb",
+  "pip>=24.0",
+  "ruff==0.15.0",
+]
 test = [
   "pytest>=9.0.0,<10.0.0",
   "pytest-asyncio>=1.0.0,<2.0.0",
-  "pytest-cov[toml]>=7.0.0,<8.0.0",
+  "pytest-cov>=7.0.0,<8.0.0",
 ]
 types = ["ty>=0.0.20,<0.1.0"]
 
@@ -52,37 +56,6 @@ exclude = ["tests"]
 
 [tool.hatch.version]
 path = "ariadne_lambda/__about__.py"
-
-[tool.hatch.envs.default]
-python = "3.10"
-features = ["dev", "types", "test"]
-path = ".venv"
-
-[tool.hatch.envs.default.scripts]
-lint = ["hatch fmt --check", "hatch run types:check"]
-check = [
-  "hatch fmt",
-  "hatch test -a -p",
-  "hatch test --cover",
-  "hatch run types:check",
-]
-changelog-preview = "git cliff --unreleased --strip all"
-changelog-update = "git cliff --unreleased -o CHANGELOG.md"
-release-notes = "git cliff --latest --strip all"
-
-[tool.hatch.envs.types.scripts]
-check = ["ty check"]
-
-[tool.hatch.envs.hatch-static-analysis]
-config-path = "none"
-dependencies = ["ruff==0.15.0"]
-
-[tool.hatch.envs.hatch-test]
-features = ["test"]
-extra-args = []
-
-[[tool.hatch.envs.hatch-test.matrix]]
-python = ["3.10", "3.11", "3.12", "3.13", "3.14"]
 
 [tool.ty.environment]
 python-version = "3.10"

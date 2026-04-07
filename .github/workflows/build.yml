@@ -24,19 +24,23 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
       - name: Set up Python 3.10
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
-      - name: Install Hatch
-        run: pipx install hatch
-
-      - name: Set package version from tag
-        run: hatch version "$(git describe --tags --always)"
+      - name: Set package version from git
+        run: |
+          VERSION=$(git describe --tags --always)
+          printf '__version__ = "%s"  # Set by CI from git describe.\n' "$VERSION" > ariadne_lambda/__about__.py
 
       - name: Build package
-        run: hatch build
+        run: uv build
 
       - name: Store the distribution packages
         uses: actions/upload-artifact@v4
